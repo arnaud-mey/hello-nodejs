@@ -1,0 +1,28 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: db-seed-$(APP_TAG)
+spec:
+  template:
+    spec:
+      containers:
+      - image: hello:$(APP_TAG)
+        imagePullPolicy: Never
+        name: db-seed
+        envFrom:
+        - secretRef:
+            name: db-creds
+        - configMapRef:
+            name: postgres-configuration
+        command:
+          - node
+          - seed.js
+        resources:
+          limits:
+            cpu: 100m
+            memory: 250Mi
+          requests:
+            cpu: 100m
+            memory: 250Mi
+      restartPolicy: OnFailure
+  backoffLimit: 30

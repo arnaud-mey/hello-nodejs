@@ -1,0 +1,14 @@
+{
+    "name" : "hello-world",
+    "version" : "0.0.1",
+    "description" : "Hello World app",
+    "author" : "Arnaud Meyer",
+    "scripts" : {
+	"start" : "node server.js"
+    },
+    "dependencies" : {
+	"pg" : "*",
+	"dotenv": "*",
+	"express": "*"
+    }
+}

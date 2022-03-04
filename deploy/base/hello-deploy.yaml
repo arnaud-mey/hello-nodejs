@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: hello-world
+  name: hello
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: hello-world
+  strategy:
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: hello-world
+    spec:
+      serviceAccountName: hello
+      containers:
+      - image: hello:$(APP_TAG)
+        imagePullPolicy: Never #setting the pull policy to never we're only using the local docker registry
+        command:
+          - npm
+          - start
+        name: hello
+        readinessProbe:
+          httpGet:
+            scheme: HTTP
+            path: /health_check
+            port: 3000
+          initialDelaySeconds: 10
+          periodSeconds: 5
+        envFrom:
+        - secretRef:
+            name: db-creds
+        - configMapRef:
+            name: postgres-configuration
+        - configMapRef:
+            name: app-config
+        resources:
+          limits:
+            cpu: 200m
+            memory: 200Mi
+          requests:
+            cpu: 100m
+            memory: 200Mi
+      initContainers:
+      - name: db-seed
+        image: groundnuty/k8s-wait-for
+        imagePullPolicy: IfNotPresent
+        args:
+          - "job"
+          - "db-seed-$(APP_TAG)"
+      restartPolicy: Always

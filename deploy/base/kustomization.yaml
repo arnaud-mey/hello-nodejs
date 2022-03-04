@@ -1,0 +1,46 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: hello-world
+
+resources:
+  - postgres-sts.yaml
+  - postgres-service.yaml
+  - hello-deploy.yaml
+  - ingress.yaml
+  - seed-job.yaml
+  - sa-rbac.yaml
+  - hello-svc.yaml
+  - namespace.yaml
+
+secretGenerator:
+  - name: db-creds
+    literals:
+    - POSTGRES_PASSWORD=somepassword #it's best not to store this here, for instance we could use sealedsecrets to encrypt secrets in the git repository
+    - POSTGRES_USER=db-user
+
+configMapGenerator:
+  - name: postgres-configuration
+    literals:
+    - POSTGRES_DB=hello-db
+  - name: app-config
+    literals:
+    - APP_LISTEN_PORT=3000
+
+vars:
+- name: APP_TAG
+  objref:
+    kind: Deployment
+    name: hello
+    apiVersion: apps/v1
+  fieldref:
+    fieldpath: metadata.labels.app_tag
+- name: APP_ENV
+  objref:
+    kind: Deployment
+    name: hello
+    apiVersion: apps/v1
+  fieldref:
+    fieldpath: metadata.labels.app_env
+
+configurations:
+- my_variables.yaml
