@@ -7,7 +7,7 @@ spec:
     spec:
       containers:
       - image: hello:$(APP_TAG)
-        imagePullPolicy: Never
+        imagePullPolicy: Never #setting the pull policy to never as we're only using the local docker registry
         name: db-seed
         envFrom:
         - secretRef:

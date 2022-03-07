@@ -19,7 +19,7 @@ spec:
       serviceAccountName: hello
       containers:
       - image: hello:$(APP_TAG)
-        imagePullPolicy: Never #setting the pull policy to never we're only using the local docker registry
+        imagePullPolicy: Never #setting the pull policy to never as we're only using the local docker registry
         command:
           - npm
           - start
@@ -46,7 +46,7 @@ spec:
             cpu: 100m
             memory: 200Mi
       initContainers:
-      - name: db-seed
+      - name: db-seed   #do not start the app before the seed script run successfully
         image: groundnuty/k8s-wait-for
         imagePullPolicy: IfNotPresent
         args:
